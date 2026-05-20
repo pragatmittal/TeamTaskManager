@@ -95,9 +95,11 @@ New accounts default to **Member** if no role is sent.
 - `server/` — Express app, models, controllers, routes, middleware, seed  
 - `client/` — Vite + React SPA  
 
-## Deploy on Railway
+## Deploy (Render + Vercel)
 
-See **[DEPLOY_RAILWAY.md](./DEPLOY_RAILWAY.md)** for step-by-step instructions (API + frontend as two services).
+See **[DEPLOY_RENDER_VERCEL.md](./DEPLOY_RENDER_VERCEL.md)** for step-by-step instructions.
+
+*(Railway guide: [DEPLOY_RAILWAY.md](./DEPLOY_RAILWAY.md) — optional.)*
 
 ## Push to GitHub
 
