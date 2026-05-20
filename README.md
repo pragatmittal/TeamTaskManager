@@ -95,6 +95,22 @@ New accounts default to **Member** if no role is sent.
 - `server/` — Express app, models, controllers, routes, middleware, seed  
 - `client/` — Vite + React SPA  
 
+## Push to GitHub
+
+`server/.env` is **not** committed (secrets stay local). `server/seed.js` **is** committed — anyone cloning the repo can run `npm run seed` to load demo data.
+
+```bash
+gh auth login
+gh repo create TeamTaskManager --public --source=. --remote=origin --push
+```
+
+If the repo already exists on your account, set the remote and push:
+
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/TeamTaskManager.git
+git push -u origin main
+```
+
 ## License
 
 MIT
