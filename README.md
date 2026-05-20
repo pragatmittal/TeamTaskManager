@@ -95,6 +95,10 @@ New accounts default to **Member** if no role is sent.
 - `server/` — Express app, models, controllers, routes, middleware, seed  
 - `client/` — Vite + React SPA  
 
+## Deploy on Railway
+
+See **[DEPLOY_RAILWAY.md](./DEPLOY_RAILWAY.md)** for step-by-step instructions (API + frontend as two services).
+
 ## Push to GitHub
 
 `server/.env` is **not** committed (secrets stay local). `server/seed.js` **is** committed — anyone cloning the repo can run `npm run seed` to load demo data.

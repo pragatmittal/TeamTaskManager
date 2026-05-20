@@ -1,0 +1,8 @@
+# Railway service: API (set Root Directory to / in the dashboard)
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/api/health"
+restartPolicyType = "on_failure"

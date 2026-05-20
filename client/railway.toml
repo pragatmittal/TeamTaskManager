@@ -1,0 +1,8 @@
+# Railway service: Frontend (set Root Directory to /client in the dashboard)
+[build]
+builder = "nixpacks"
+buildCommand = "npm install && npm run build"
+
+[deploy]
+startCommand = "npm start"
+restartPolicyType = "on_failure"
