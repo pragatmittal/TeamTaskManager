@@ -93,17 +93,29 @@ Copy your Vercel URL, e.g. `https://team-task-manager.vercel.app`
 
 ---
 
-## Part 3 — Connect API CORS to Vercel
+## Part 3 — Connect API CORS to Vercel (fixes “Network / CORS” errors)
 
-Back in **Render** → your API service → **Environment**:
+Back in **Render** → **TeamTaskManager** → **Environment** → **Edit** → **Add**:
 
 | Key | Value |
 |-----|--------|
-| `CLIENT_URL` | `https://YOUR-APP.vercel.app` |
+| `CLIENT_URL` | `https://team-task-manager-beta-blush.vercel.app` |
 
-Use the exact Vercel URL, **no trailing slash**.
+**Important:**
+- Use your real Vercel URL (no trailing `/` at the end).
+- This must be set on **Render**, not only on Vercel.
+- Vercel only needs `VITE_API_URL` = `https://teamtaskmanager-flta.onrender.com/api`
 
-Save → Render will **redeploy** the API automatically.
+Example for this project:
+
+| Where | Variable | Value |
+|-------|----------|--------|
+| **Vercel** | `VITE_API_URL` | `https://teamtaskmanager-flta.onrender.com/api` |
+| **Render** | `CLIENT_URL` | `https://team-task-manager-beta-blush.vercel.app` |
+
+Click **Save** → Render **redeploys** the API (wait until Live).
+
+Verify: open Vercel app → login should work; Render logs should **not** show `Not allowed by CORS`.
 
 ---
 

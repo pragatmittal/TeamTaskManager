@@ -17,20 +17,43 @@ import dashboardRoutes from './routes/dashboard.routes.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-].filter(Boolean);
+function normalizeOrigin(url) {
+  if (!url) return '';
+  return url.trim().replace(/\/$/, '');
+}
+
+function getAllowedOrigins() {
+  const fromEnv = [process.env.CLIENT_URL, process.env.CLIENT_URLS]
+    .filter(Boolean)
+    .flatMap((value) => value.split(','))
+    .map(normalizeOrigin)
+    .filter(Boolean);
+
+  return [...new Set([...fromEnv, 'http://localhost:5173', 'http://127.0.0.1:5173'])];
+}
+
+const allowedOrigins = getAllowedOrigins();
+
+if (process.env.NODE_ENV === 'production' && allowedOrigins.length <= 2) {
+  console.warn(
+    'CORS: Set CLIENT_URL on Render to your Vercel URL (e.g. https://team-task-manager-beta-blush.vercel.app)'
+  );
+}
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+      if (!origin) {
         callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
+        return;
       }
+      const normalized = normalizeOrigin(origin);
+      if (allowedOrigins.includes(normalized)) {
+        callback(null, true);
+        return;
+      }
+      console.warn(`CORS blocked origin: ${origin}. Allowed: ${allowedOrigins.join(', ')}`);
+      callback(null, false);
     },
     credentials: true,
   })
