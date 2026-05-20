@@ -1,53 +1,57 @@
-# Deploy on Render (API) + Vercel (frontend)
+# Deploy with Render (API) + Vercel (frontend)
 
 ## Before you start
 
 1. **MongoDB Atlas** → Network Access → **Allow Access from Anywhere** (`0.0.0.0/0`).
-2. Repo on GitHub: `pragatmittal/TeamTaskManager`.
+2. Have your Atlas connection string ready (same as local `server/.env`).
 
 ---
 
 ## Part 1 — Render (backend API)
 
-In Render: **New** → **Web Service** → connect `TeamTaskManager`.
+You are on **New Web Service**. Fill the form like this:
 
-Fill the form **exactly** like this:
-
-| Field | Value |
-|-------|--------|
-| **Name** | `team-task-manager-api` (or any name) |
-| **Region** | Oregon (or same region you prefer) |
+| Field | What to enter |
+|-------|----------------|
+| **Name** | `team-task-manager-api` (or any unique name) |
+| **Language** | `Node` |
 | **Branch** | `main` |
-| **Root Directory** | *(leave empty)* |
-| **Runtime** | Node |
+| **Region** | Oregon or Singapore (either is fine) |
+| **Root Directory** | **Leave empty** (repo root, not `client`) |
 | **Build Command** | `npm install` |
 | **Start Command** | `npm start` |
-| **Instance Type** | Free (ok for demos; cold starts after idle) |
+| **Instance Type** | Free (for testing) |
+
+Do **not** use `yarn` unless you use Yarn locally — this project uses **npm**.
 
 ### Environment variables (Render → Environment)
 
+Click **Add Environment Variable** for each:
+
 | Key | Value |
 |-----|--------|
-| `MONGO_URI` | Your Atlas connection string |
-| `JWT_SECRET` | Long random string (e.g. 32+ chars) |
+| `MONGO_URI` | `mongodb+srv://...` (your Atlas URI) |
+| `JWT_SECRET` | Long random string (e.g. 32+ characters) |
 | `JWT_EXPIRES_IN` | `7d` |
-| `CLIENT_URL` | Leave empty until Vercel is deployed, then set to your Vercel URL (see below) |
+| `CLIENT_URL` | Leave empty for now — add after Vercel (step 2) |
 
-Click **Deploy Web Service**.
+Then click **Deploy Web Service**.
 
-When deploy succeeds, open the service URL, e.g.:
+### After deploy
 
-`https://team-task-manager-api.onrender.com`
+1. Wait until status is **Live**.
+2. Open the service → copy your public URL, e.g.  
+   `https://team-task-manager-api.onrender.com`
+3. Test in browser:  
+   `https://YOUR-API.onrender.com/api/health`  
+   You should see: `{"data":{"ok":true}}`
 
-Test API: `https://YOUR-API.onrender.com/api/health` → should return `{"data":{"ok":true}}`.
+### Seed production database (once)
 
-Copy your API base URL: `https://YOUR-API.onrender.com`
-
-### Seed the database (once)
-
-On your computer (with `server/.env` using the same `MONGO_URI`):
+On your Mac (with `MONGO_URI` in `server/.env` pointing to Atlas):
 
 ```bash
+cd TeamTaskManager
 npm run seed
 ```
 
@@ -56,25 +60,34 @@ npm run seed
 ## Part 2 — Vercel (React frontend)
 
 1. Go to [vercel.com](https://vercel.com) → **Add New** → **Project**.
-2. Import `pragatmittal/TeamTaskManager`.
+2. Import GitHub repo **`pragatmittal/TeamTaskManager`**.
 3. Configure:
 
 | Field | Value |
 |-------|--------|
 | **Framework Preset** | Vite |
-| **Root Directory** | `client` ← click Edit, set to `client` |
-| **Build Command** | `npm run build` (default) |
+| **Root Directory** | `client` (click Edit → set to `client`) |
+| **Build Command** | `npm run build` (default for Vite) |
 | **Output Directory** | `dist` (default) |
+| **Install Command** | `npm install` |
 
-### Environment variables (Vercel → Settings → Environment Variables)
+### Environment variable (Vercel → Environment Variables)
 
 | Key | Value |
 |-----|--------|
 | `VITE_API_URL` | `https://YOUR-API.onrender.com/api` |
 
-Use your **real** Render URL and include `/api` at the end.
+Replace `YOUR-API` with your real Render hostname. **Must end with `/api`.**
 
-4. **Deploy**.
+Example:
+
+```
+https://team-task-manager-api.onrender.com/api
+```
+
+4. Click **Deploy**.
+
+### After Vercel is live
 
 Copy your Vercel URL, e.g. `https://team-task-manager.vercel.app`
 
@@ -88,41 +101,36 @@ Back in **Render** → your API service → **Environment**:
 |-----|--------|
 | `CLIENT_URL` | `https://YOUR-APP.vercel.app` |
 
-No trailing slash. Save → Render will **redeploy** the API.
+Use the exact Vercel URL, **no trailing slash**.
+
+Save → Render will **redeploy** the API automatically.
 
 ---
 
 ## Part 4 — Test
 
 1. Open your **Vercel** URL.
-2. Login: `admin@example.com` / `password123` (after seed).
+2. Log in: `admin@example.com` / `password123` (after `npm run seed`).
 3. Or **Sign up** and pick Admin / Member.
 
 ---
-
-## Quick reference
-
-| | URL |
-|---|-----|
-| Frontend | `https://….vercel.app` |
-| API | `https://….onrender.com` |
-| Health check | `https://….onrender.com/api/health` |
 
 ## Troubleshooting
 
 | Problem | Fix |
 |---------|-----|
-| Render build fails | Build = `npm install` only (not `yarn`) |
-| `Application failed to respond` | Check Render logs; verify `MONGO_URI` and Atlas IP allowlist |
-| Login fails on Vercel | `VITE_API_URL` must be `https://xxx.onrender.com/api` then **redeploy** Vercel |
-| CORS error | `CLIENT_URL` on Render must match Vercel URL exactly |
-| 404 on refresh (Vercel routes) | `vercel.json` in repo handles SPA rewrites |
-| Slow first request | Render free tier sleeps after ~15 min idle |
+| Render build fails on `yarn` | Set Build Command to `npm install` |
+| `Application failed to respond` on Render | Check logs; usually wrong `MONGO_URI` or Atlas IP not allowed |
+| Login fails / network error on Vercel | `VITE_API_URL` must be `https://....onrender.com/api` — redeploy Vercel after changing |
+| CORS error in browser console | Set `CLIENT_URL` on Render to exact Vercel URL; redeploy API |
+| Slow first request on Free Render | Free tier sleeps after ~15 min idle — wait ~30s on first load |
+| 404 on refresh (`/dashboard`) | `client/vercel.json` handles SPA routes — ensure it’s deployed |
 
-## Local development (unchanged)
+---
 
-```bash
-npm run dev
-```
+## Summary
 
-Uses Vite proxy to `/api` — no `VITE_API_URL` needed locally.
+| Service | Hosts | Root folder |
+|---------|--------|-------------|
+| **Render** | Express API | `/` (repo root) |
+| **Vercel** | React app | `/client` |

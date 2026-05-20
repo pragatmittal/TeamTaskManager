@@ -99,7 +99,8 @@ New accounts default to **Member** if no role is sent.
 
 See **[DEPLOY_RENDER_VERCEL.md](./DEPLOY_RENDER_VERCEL.md)** for step-by-step instructions.
 
-*(Railway guide: [DEPLOY_RAILWAY.md](./DEPLOY_RAILWAY.md) — optional.)*
+- **Render** — Node API (`npm install` → `npm start`, repo root)
+- **Vercel** — React app (`client` folder, set `VITE_API_URL`)
 
 ## Push to GitHub
 
